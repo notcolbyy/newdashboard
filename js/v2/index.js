@@ -9,6 +9,7 @@ export * from './model/tax.js';
 export * from './model/service.js';
 export * from './model/compensation.js';
 export * from './model/mortgage.js';
+export * from './model/liabilities.js';
 export * from './model/events.js';
 export * from './model/decisions.js';
 export * from './model/simulate.js';
