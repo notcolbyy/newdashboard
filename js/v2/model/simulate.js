@@ -3,6 +3,7 @@ import { resolvePlannedEvents, realizeEvent } from './events.js';
 import { calculateFederalTaxes } from './tax.js';
 import { applyRate, sumCents } from './money.js';
 import { reconcileCash, reconcileBalanceSheet } from './reconciliation.js';
+import { calculateLiabilityYear } from './liabilities.js';
 import { validateModelDocument } from '../storage/schema.js';
 
 const ACTIVE=(entry,year)=>year>=entry.startYear&&year<=(entry.endYear??year);
@@ -18,6 +19,7 @@ export function simulate(model,{taxTables={}}={}){
     const cashAccount=model.accounts.find(a=>a.type==='generalCash');if(!cashAccount)throw new TypeError('A generalCash account is required.');
     const cashSources=model.income.filter(e=>ACTIVE(e,year)).map(e=>({id:e.id,type:e.type??'income',amountCents:e.amountCents,taxable:e.taxable!==false,ownerId:e.ownerId}));
     const cashUses=model.spending.filter(e=>ACTIVE(e,year)).map(e=>({id:e.id,type:e.type??'spending',amountCents:e.amountCents}));
+    const liabilityChanges=[];for(const liability of model.liabilities){const scheduledPaymentCents=(liability.scheduledPayments??[]).filter(e=>e.year===year).reduce((s,e)=>s+e.amountCents,0),extraPrincipalCents=(liability.extraPrincipalPayments??[]).filter(e=>e.year===year).reduce((s,e)=>s+e.amountCents,0),change=calculateLiabilityYear({...liability,openingBalanceCents:liabilityState.get(liability.id),scheduledPaymentCents,extraPrincipalCents});liabilityState.set(liability.id,change.closingBalanceCents);liabilityChanges.push(change);if(change.totalPaymentCents)cashUses.push({id:`liability:${liability.id}`,type:'debtPayment',amountCents:change.totalPaymentCents});}
     const yearEvents=planned.filter(e=>Number(e.resolvedDate.slice(0,4))===year);for(const event of yearEvents)realizedEvents.push(realizeEvent(event,event.resolvedDate));
     const earners=people.map(person=>({wagesCents:cashSources.filter(s=>s.ownerId===person.id&&s.taxable).reduce((n,s)=>n+s.amountCents,0),taxableIncomeCents:cashSources.filter(s=>s.ownerId===person.id&&s.taxable).reduce((n,s)=>n+s.amountCents,0),pretaxRetirementCents:0}));
     const taxTable=taxTables[year];const taxes=taxTable?calculateFederalTaxes({filingStatus:model.household.filingStatus,earners,table:taxTable}):null;if(taxes)cashUses.push({id:`tax:${year}`,type:'tax',amountCents:taxes.totalTaxCents});
@@ -28,7 +30,7 @@ export function simulate(model,{taxTables={}}={}){
     const cashReconciliation=reconcileCash({year,openingCashCents:openingCash,sources:cashSources,uses:cashUses,actualClosingCashCents:accountState.get(cashAccount.id)});
     const balanceSheetReconciliation=reconcileBalanceSheet({year,accountValuesCents:[...accountState.values()],assetValuesCents,liabilityValuesCents:[...liabilityState.values()],reportedGrossAssetsCents:grossAssetsCents,reportedLiabilitiesCents:totalLiabilitiesCents,reportedNetWorthCents:netWorthCents});
     if(cashReconciliation.warning)warnings.push(cashReconciliation.warning);if(balanceSheetReconciliation.warning)warnings.push(balanceSheetReconciliation.warning);
-    results.push({year,openingBalances:{accounts:openingAccounts,liabilities:openingLiabilities},cashSources,cashUses,accountActivity,assetChanges:[],liabilityChanges:[],closingBalances:{accounts:Object.fromEntries(accountState),liabilities:Object.fromEntries(liabilityState)},taxes,balanceSheet:{grossAssetsCents,totalLiabilitiesCents,netWorthCents},reconciliation:{cash:cashReconciliation,balanceSheet:balanceSheetReconciliation}});
+    results.push({year,openingBalances:{accounts:openingAccounts,liabilities:openingLiabilities},cashSources,cashUses,accountActivity,assetChanges:[],liabilityChanges,closingBalances:{accounts:Object.fromEntries(accountState),liabilities:Object.fromEntries(liabilityState)},taxes,balanceSheet:{grossAssetsCents,totalLiabilitiesCents,netWorthCents},reconciliation:{cash:cashReconciliation,balanceSheet:balanceSheetReconciliation}});
   }
   if(JSON.stringify(model.plannedEvents)!==originalEvents)throw new Error('Simulation mutated planned events.');
   return{years:results,realizedEvents,decisions:[],warnings,errors:[],metadata:{valid:true,schemaVersion:model.schemaVersion,modelVersion:model.modelVersion,baseCurrencyYear:model.baseCurrencyYear,deterministic:true}};
