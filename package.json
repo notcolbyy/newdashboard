@@ -1,0 +1,10 @@
+{
+  "name": "life-wealth-dashboard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test js/v2/tests/*.test.js",
+    "v2:fixture": "node js/v2/dev/run-fixture.js"
+  },
+  "engines": { "node": ">=20" }
+}

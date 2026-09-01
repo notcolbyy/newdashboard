@@ -1,0 +1,19 @@
+export const SCHEMA_VERSION='2.0.0';
+export const MODEL_VERSION='2.0.0-m1';
+
+export function createModelDocument(input={}){
+  const referenceBirthYear=input.people?.find(p=>p.isReference)?.birthYear??2007;
+  return {schemaVersion:SCHEMA_VERSION,modelVersion:MODEL_VERSION,baseCurrencyYear:2025,savedAt:new Date(0).toISOString(),household:{id:'household',simulationStartYear:referenceBirthYear+18,simulationEndYear:referenceBirthYear+95,filingStatus:'single',...input.household},people:structuredClone(input.people??[{id:'reference',isReference:true,birthYear:referenceBirthYear}]),assumptions:structuredClone(input.assumptions??{}),accounts:structuredClone(input.accounts??[]),liabilities:structuredClone(input.liabilities??[]),assets:structuredClone(input.assets??[]),income:structuredClone(input.income??[]),spending:structuredClone(input.spending??[]),plannedEvents:structuredClone(input.plannedEvents??[]),goals:structuredClone(input.goals??[]),policies:structuredClone(input.policies??{}),provenance:structuredClone(input.provenance??{}),serviceHistories:structuredClone(input.serviceHistories??[]),extensions:structuredClone(input.extensions??{})};
+}
+
+export function validateModelDocument(model){
+  const errors=[],warnings=[];
+  if(model?.schemaVersion!==SCHEMA_VERSION)errors.push({code:'SCHEMA_VERSION_UNSUPPORTED',path:'schemaVersion',message:`Expected ${SCHEMA_VERSION}.`});
+  if(!model?.modelVersion)errors.push({code:'MODEL_VERSION_REQUIRED',path:'modelVersion',message:'modelVersion is required.'});
+  if(!Number.isInteger(model?.baseCurrencyYear))errors.push({code:'BASE_YEAR_INVALID',path:'baseCurrencyYear',message:'baseCurrencyYear must be an integer.'});
+  if(!Array.isArray(model?.people)||!model.people.length)errors.push({code:'PEOPLE_REQUIRED',path:'people',message:'At least one person is required.'});
+  for(const account of model?.accounts??[]){if(!account.id)errors.push({code:'ACCOUNT_ID_REQUIRED',path:'accounts',message:'Account id is required.'});if(!Number.isSafeInteger(account.openingBalanceCents))errors.push({code:'ACCOUNT_BALANCE_INVALID',path:`accounts.${account.id}`,message:'openingBalanceCents must be integer cents.'});}
+  const known=new Set(['schemaVersion','modelVersion','baseCurrencyYear','savedAt','household','people','assumptions','accounts','liabilities','assets','income','spending','plannedEvents','goals','policies','provenance','serviceHistories','extensions']);
+  for(const key of Object.keys(model??{}))if(!known.has(key))warnings.push({code:'UNKNOWN_FIELD_PRESERVED',path:key,message:'Unknown field will be preserved.'});
+  return {valid:errors.length===0,errors,warnings};
+}
