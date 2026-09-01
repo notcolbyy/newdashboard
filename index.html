@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="styles.css?v=20260901-3" />
+  <link rel="stylesheet" href="styles.css?v=20260901-4" />
 </head>
 <body>
   <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
@@ -46,12 +46,35 @@
       <div><span>Scenario</span><strong id="snapshotScenario">Realistic</strong></div><div><span>Properties at 50</span><strong id="snapshotProperties">—</strong></div><div><span>Gross / month at 35</span><strong id="snapshotMonthlyIncome">—</strong></div><div><span>Savings target</span><strong id="snapshotSavings">—</strong></div>
     </section>
 
+    <section class="age-explorer glass reveal" aria-labelledby="ageExplorerTitle">
+      <div class="age-explorer-heading">
+        <div><span class="eyebrow">EXPLORE THE PROJECTION</span><h2 id="ageExplorerTitle">See the plan at any age</h2><p id="selectedComposition">—</p></div>
+        <div class="selected-age" aria-live="polite"><span>SELECTED AGE</span><strong id="selectedAgeDisplay">35</strong></div>
+      </div>
+      <div class="age-explorer-body">
+        <div class="age-controls">
+          <div class="age-range-labels"><span>Age 25</span><span>Age 50</span></div>
+          <input id="ageSlider" type="range" min="25" max="50" step="1" value="35" aria-label="Selected projection age" aria-describedby="ageSliderHelp">
+          <div class="age-jumps" aria-label="Jump to age"><button type="button" data-jump-age="25">25</button><button type="button" data-jump-age="35">35</button><button type="button" id="retirementAgeJump" data-jump-age="retirement">Retirement</button><button type="button" data-jump-age="50">50</button></div>
+          <p id="ageSliderHelp" class="projection-note">Use the arrow keys for precise control. Longer-range projections are more sensitive to assumptions.</p>
+        </div>
+        <div class="age-metrics">
+          <div><span>Net worth</span><strong id="ageNetWorth">—</strong></div>
+          <div><span>Household gross income</span><strong id="ageGrossIncome">—</strong></div>
+          <div><span>Properties owned</span><strong id="ageProperties">—</strong></div>
+          <div><span>Property equity</span><strong id="ageEquity">—</strong></div>
+          <div><span>Investments + reserves</span><strong id="ageInvestmentsCash">—</strong></div>
+          <div><span>Monthly rental surplus</span><strong id="ageRentalSurplus">—</strong></div>
+        </div>
+      </div>
+    </section>
+
     <section id="wealth" class="dashboard-grid">
       <article class="panel glass span-2 reveal feature-panel"><div class="panel-heading"><div><span class="eyebrow">WEALTH</span><h2>Net worth projection</h2><p>Real-estate equity, investments, and cash compounding together.</p></div><div class="panel-badge">AGE 25 → 50</div></div><div class="chart-wrap large"><canvas id="netWorthChart"></canvas></div></article>
-      <article class="panel glass reveal"><div class="panel-heading"><div><span class="eyebrow">INCOME</span><h2>Household gross income</h2><p>Career income and annual rental cash flow.</p></div></div><div class="chart-wrap"><canvas id="incomeChart"></canvas></div></article>
-      <article id="real-estate" class="panel glass reveal"><div class="panel-heading"><div><span class="eyebrow">REAL ESTATE</span><h2>Rental portfolio value</h2><p>Property value alongside estimated remaining debt.</p></div></div><div class="chart-wrap"><canvas id="portfolioChart"></canvas></div></article>
+      <article class="panel glass reveal"><div class="panel-heading"><div><span class="eyebrow">INCOME</span><h2>Where income comes from</h2><p>JAG pay, physician income, and annual rental cash flow.</p></div></div><div class="chart-wrap"><canvas id="incomeChart"></canvas></div></article>
+      <article id="real-estate" class="panel glass reveal"><div class="panel-heading"><div><span class="eyebrow">REAL ESTATE</span><h2>Rental portfolio value</h2><p>Property value alongside estimated remaining debt.</p></div></div><div id="acquisitionRail" class="acquisition-rail" role="list" aria-label="Property acquisition timeline"></div><div id="acquisitionDetail" class="acquisition-detail" aria-live="polite">Select a property marker to inspect its acquisition year.</div><div class="chart-wrap portfolio-chart-wrap"><canvas id="portfolioChart"></canvas></div></article>
       <article class="panel glass reveal"><div class="panel-heading"><div><span class="eyebrow">CASH FLOW</span><h2>Monthly rental surplus</h2><p>Modeled monthly surplus across the portfolio.</p></div></div><div class="chart-wrap"><canvas id="cashFlowChart"></canvas></div></article>
-      <article class="panel glass reveal assets-panel"><div class="panel-heading"><div><span class="eyebrow">ASSET MIX</span><h2>What you own at 50</h2><p>Where modeled wealth is concentrated.</p></div></div><div class="chart-wrap"><canvas id="assetsChart"></canvas></div></article>
+      <article class="panel glass reveal assets-panel"><div class="panel-heading"><div><span class="eyebrow">WEALTH COMPOSITION</span><h2>How wealth is built</h2><p>Real-estate equity, investments, and reserves over time.</p></div></div><div class="chart-wrap"><canvas id="wealthCompositionChart"></canvas></div></article>
 
       <article class="panel glass span-2 reveal scenario-explainer"><div><span class="eyebrow">CURRENT SCENARIO</span><h2 id="scenarioTitle">Realistic baseline</h2><p id="scenarioDescription">A middle-of-the-road model using your editable assumptions without extra upside or downside multipliers.</p></div><div class="scenario-factors" id="scenarioFactors"></div></article>
 
@@ -67,5 +90,5 @@
     <div class="form-section span-form"><span>Real estate</span></div><label>First rental purchase age<input id="firstRentalAge" type="number" min="20" max="45" step="1"></label><label>Years between rentals<input id="rentalInterval" type="number" min="1" max="10" step="1"></label><label>Typical rental purchase price<input id="rentalPrice" type="number" min="50000" step="5000"></label><label>Property appreciation<input id="appreciation" type="number" min="0" max="12" step="0.1"></label><label>Starting monthly cash flow / rental<input id="cashFlowPerRental" type="number" min="0" step="25"></label><label>Annual rent/cash-flow growth<input id="cashFlowGrowth" type="number" min="0" max="12" step="0.1"></label>
     <div class="form-section span-form"><span>Retirement</span></div><label>Air Force retirement age<input id="retirementAge" type="number" min="40" max="65" step="1"></label><label>Annual retirement income estimate<input id="retirementIncome" type="number" min="0" step="1000"></label><div class="form-actions"><button type="button" id="resetAssumptions" class="secondary-button">Reset defaults</button><button type="submit" class="primary-button">Update dashboard</button></div></form></div></aside>
   <footer><p>Planning model only. Pay, benefits, taxes, housing allowances, mortgage rates, insurance, medical training costs, market returns, and property performance can change materially.</p></footer>
-  <script src="app.js?v=20260901-3"></script>
+  <script src="app.js?v=20260901-4"></script>
 </body></html>
