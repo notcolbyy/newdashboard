@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {ageOnDate,resolvePeople,resolveEventDate,serviceYearsOnDate,buildPriceIndex,nominalToReal,realToNominal,FEDERAL_TAX_2026,PRICE_INDEX,calculateFederalTaxes,dollarsToCents,monthlyPaymentCents,amortizeMortgage,aggregateMortgageYear,resolvePlannedEvents,realizeEvent,evaluateReserveDecision,BRS_RULES,brsServiceContribution,simulate,validateModelDocument,migrateModelDocument,createCompensationRecord,compensationToIncomeEntries,reconcileCash,reconcileBalanceSheet} from '../index.js';
+import {ageOnDate,resolvePeople,resolveEventDate,serviceYearsOnDate,buildPriceIndex,nominalToReal,realToNominal,FEDERAL_TAX_2026,PRICE_INDEX,calculateFederalTaxes,dollarsToCents,monthlyPaymentCents,amortizeMortgage,aggregateMortgageYear,calculateLiabilityYear,resolvePlannedEvents,realizeEvent,evaluateReserveDecision,BRS_RULES,brsServiceContribution,simulate,validateModelDocument,migrateModelDocument,createCompensationRecord,compensationToIncomeEntries,reconcileCash,reconcileBalanceSheet} from '../index.js';
 import { minimalLifeFixture } from './fixtures.js';
 
 test('calendar resolves exact ages, offsets, age events, service years, and midyear ordering',()=>{
@@ -30,6 +30,12 @@ test('mortgage handles known payment, first year, midyear start, extra principal
   const mid=amortizeMortgage({principalCents:dollarsToCents(12000),annualRate:.05,termMonths:12,startDate:'2026-06-01',throughYear:2026,extraPrincipalByMonth:{'2026-09':dollarsToCents(500)}});assert.equal(mid.rows.length,6);assert.equal(mid.rows.find(r=>r.month==='2026-09').extraPrincipalCents,dollarsToCents(500));
   assert.equal(monthlyPaymentCents(dollarsToCents(1200),0,12),dollarsToCents(100));
   const payoff=amortizeMortgage({principalCents:dollarsToCents(1000),annualRate:.05,termMonths:12,startDate:'2026-01-01',throughYear:2026,payoffDate:'2026-05-01'});assert.equal(payoff.closingBalanceCents,0);assert.equal(payoff.rows.at(-1).payoff,true);
+});
+
+test('generic liabilities handle interest, zero interest, extra principal, and final-payment caps',()=>{
+  const normal=calculateLiabilityYear({id:'loan',openingBalanceCents:dollarsToCents(10000),annualRate:.05,scheduledPaymentCents:dollarsToCents(1500),extraPrincipalCents:dollarsToCents(500)});assert.equal(normal.interestCents,dollarsToCents(500));assert.equal(normal.principalPaidCents,dollarsToCents(1500));assert.equal(normal.closingBalanceCents,dollarsToCents(8500));
+  const zero=calculateLiabilityYear({id:'zero',openingBalanceCents:dollarsToCents(1000),annualRate:0,scheduledPaymentCents:dollarsToCents(200)});assert.equal(zero.interestCents,0);assert.equal(zero.closingBalanceCents,dollarsToCents(800));
+  const payoff=calculateLiabilityYear({id:'payoff',openingBalanceCents:dollarsToCents(100),annualRate:.1,scheduledPaymentCents:dollarsToCents(1000),extraPrincipalCents:dollarsToCents(500)});assert.equal(payoff.totalPaymentCents,dollarsToCents(110));assert.equal(payoff.closingBalanceCents,0);
 });
 
 test('events are immutable and realized records preserve planned/actual timing',()=>{const source=[{id:'e',type:'income.once',personId:'p',age:25}];const before=JSON.stringify(source),resolved=resolvePlannedEvents(source,[{id:'p',isReference:true,birthYear:2000}]),realized=realizeEvent(resolved[0],'2025-07-01');assert.equal(JSON.stringify(source),before);assert.equal(realized.plannedEventId,'e');assert.equal(realized.actualDate,'2025-07-01');});
