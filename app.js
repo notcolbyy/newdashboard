@@ -104,7 +104,7 @@ function renderAcquisitionRail(rows){
   rows.forEach(row=>{
     if(row.propertyCount<=previousCount)return;
     for(let propertyNumber=previousCount+1;propertyNumber<=row.propertyCount;propertyNumber++){
-      const button=document.createElement('button');button.type='button';button.className='acquisition-marker';button.dataset.age=row.age;button.setAttribute('role','listitem');button.setAttribute('aria-label',`Property ${propertyNumber}, purchased at age ${row.age}. ${acquisitionDescription(row)}`);button.title=acquisitionDescription(row);button.innerHTML=`<span>Age ${row.age}</span><strong>Property ${propertyNumber}</strong>`;
+      const button=document.createElement('button');button.type='button';button.className='acquisition-marker';button.dataset.age=row.age;button.setAttribute('aria-label',`Property ${propertyNumber}, purchased at age ${row.age}. ${acquisitionDescription(row)}`);button.title=acquisitionDescription(row);button.innerHTML=`<span>Age ${row.age}</span><strong>Property ${propertyNumber}</strong>`;
       const showDetail=()=>detail.textContent=acquisitionDescription(row);button.addEventListener('mouseenter',showDetail);button.addEventListener('focus',showDetail);button.addEventListener('click',()=>updateSelectedAgeMetrics(row.age,true));rail.appendChild(button);
     }
     previousCount=row.propertyCount;
