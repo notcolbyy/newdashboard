@@ -12,4 +12,8 @@ Money is stored as integer cents. Intermediate rates use JavaScript numbers and 
 
 Milestone 2 adds the engine-only household ledger. Career stages produce compensation records; the ledger then applies taxes, spending, retirement policies, reserves, investing, debt activity, and reconciled net-worth-change explanations. Opening balances receive a full year of configured growth and regular annual contributions receive half-year growth.
 
-Run `npm test` for deterministic fixtures. Run `npm run v2:fixture -- --year=2032` for the 2026–2038 golden-household summary and a detailed selected-year ledger.
+Milestone 3 adds a generic material-asset lifecycle and a specialized property engine. Property intents are evaluated before acquisition, failed optional purchases can be delayed and reevaluated, and every purchase, conversion, rental operation, reserve movement, sale, and transfer is represented by traceable cash postings, decisions, and realized events. Property mortgages reuse `model/mortgage.js`; there is no second amortization implementation.
+
+The generic lifecycle already supports the state sequence required by a future vehicle module (`planned → acquired → held → sold/disposed`) with preserved ownership, linked liabilities, valuation rules, and status history. Vehicle-specific depreciation, financing choices, trade-in handling, and replacement policies remain intentionally deferred.
+
+Run `npm test` for deterministic fixtures. Run `npm run v2:fixture -- --year=2032` for the 2026–2038 golden-household summary. Run `npm run v2:property-fixture -- --year=2034` for the 2030–2039 property lifecycle and a detailed selected-year explanation.

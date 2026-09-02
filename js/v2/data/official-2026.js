@@ -13,6 +13,7 @@ export const PROVENANCE = createProvenanceRegistry([
   ,{id:'planning.pediatrics.2026',classification:'estimated',source:{title:'Editable pediatric compensation planning baseline',url:'model://planning/pediatrics'},sourceType:'ConfigurablePlanningDefault',effectiveDate:'2026-01-01',retrievedDate:'2026-09-02',confidence:'medium',editable:true,yearKeyed:true,locationKeyed:true}
   ,{id:'planning.militaryPayGrowth',classification:'projected',source:{title:'Editable military compensation growth assumption',url:'model://planning/military-pay-growth'},sourceType:'ConfigurablePlanningDefault',effectiveDate:'2027-01-01',retrievedDate:'2026-09-02',confidence:'low',editable:true,yearKeyed:true,locationKeyed:false}
   ,{id:'planning.basGrowth',classification:'projected',source:{title:'Editable BAS growth assumption',url:'model://planning/bas-growth'},sourceType:'ConfigurablePlanningDefault',effectiveDate:'2027-01-01',retrievedDate:'2026-09-02',confidence:'low',editable:true,yearKeyed:true,locationKeyed:false}
+  ,{id:'planning.property.defaults.m3',classification:'estimated',source:{title:'Editable Milestone 3 property fixture assumptions',url:'model://planning/property-defaults'},sourceType:'ConfigurablePlanningDefault',effectiveDate:'2026-09-02',retrievedDate:'2026-09-02',confidence:'low',editable:true,yearKeyed:false,locationKeyed:true,notes:'Development-fixture defaults only; property-specific inputs override every value.'}
 ]);
 
 export function projectFederalTaxTable(base,year,annualInflation=.025){

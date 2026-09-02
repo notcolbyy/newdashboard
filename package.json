@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test js/v2/tests/*.test.js",
-    "v2:fixture": "node js/v2/dev/run-fixture.js"
+    "v2:fixture": "node js/v2/dev/run-fixture.js",
+    "v2:property-fixture": "node js/v2/dev/run-property-fixture.js"
   },
   "engines": { "node": ">=20" }
 }
