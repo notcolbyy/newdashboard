@@ -16,4 +16,8 @@ Milestone 3 adds a generic material-asset lifecycle and a specialized property e
 
 The generic lifecycle already supports the state sequence required by a future vehicle module (`planned → acquired → held → sold/disposed`) with preserved ownership, linked liabilities, valuation rules, and status history. Vehicle-specific depreciation, financing choices, trade-in handling, and replacement policies remain intentionally deferred.
 
-Run `npm test` for deterministic fixtures. Run `npm run v2:fixture -- --year=2032` for the 2026–2038 golden-household summary. Run `npm run v2:property-fixture -- --year=2034` for the 2030–2039 property lifecycle and a detailed selected-year explanation.
+Milestone 4 adds reusable goal records, transparent priority allocation, goal-specific funding policies, status histories, deterministic blocker ranking, and a long-term-home feasibility engine. “Possible” means hard transaction and stability constraints pass; “comfortably affordable” additionally requires the configured housing-burden, free-cash-flow, discretionary-capacity, retirement, obligation, and liquidity rules to pass. Housing burden uses annual required housing costs divided by after-tax household income by default. This is a planning convention—not mortgage approval or underwriting.
+
+Goal execution produces a normal Milestone 3 property intent, property asset, linked mortgage, decision, and realized event. Cash, dedicated goal funds, taxable investments, selected sale proceeds, reserves, and protected accounts remain explicit. The engine never sells rentals or optimizes terminal wealth without an enabled policy.
+
+Run `npm test` for deterministic fixtures. Run `npm run v2:fixture -- --year=2032` for the 2026–2038 golden-household summary. Run `npm run v2:property-fixture -- --year=2034` for the 2030–2039 property lifecycle. Run `npm run v2:goal-fixture -- --year=2040` for the 2036–2041 long-term-home lifecycle and generic goal-priority fixture.

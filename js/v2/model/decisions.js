@@ -1,4 +1,4 @@
-export const DECISION_STATUSES=Object.freeze(['feasible','executed','delayed','rejected','needsUserChoice']);
+export const DECISION_STATUSES=Object.freeze(['feasible','possible','comfortablyAffordable','executed','completed','delayed','rejected','needsUserChoice']);
 
 export function evaluateReserveDecision({id,availableCents,requiredCents,plannedDate}){
   const pass=availableCents>=requiredCents,shortfallCents=Math.max(0,requiredCents-availableCents);
