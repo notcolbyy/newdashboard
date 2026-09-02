@@ -1,5 +1,9 @@
 # V2 authoritative output contract
 
+Contract version: **2.0.0**
+
+V2.0 fields documented here are stable for UI consumers. Additive fields may be introduced without changing the major contract version. Renames, removals, unit changes, or semantic changes require a breaking contract version, calculation `modelVersion` review, regression tests, and migration review when persisted input is affected.
+
 `simulateFinancialLife(modelInput, { data, taxTables })` is the supported integration boundary for future UI work. Internal helper and fixture shapes are not UI contracts.
 
 ## Top-level result
@@ -89,3 +93,7 @@ Every annual result reports:
 - goal-funding reconciliation
 
 The top-level `invariants.passes` is true only when every annual invariant passes.
+
+## Reproducibility boundary
+
+`simulateReproducibly` wraps the authoritative simulation with a run manifest containing engine, model, schema, output-contract, input, assumption, and normalized-data identities. `schemaVersion` describes persisted structure; `modelVersion` describes calculation behavior. Replay is guaranteed only while the matching engine/model version and normalized datasets remain supported.

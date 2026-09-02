@@ -1,6 +1,9 @@
 export * from './storage/schema.js';
 export * from './storage/migrations.js';
+export * from './storage/canonical.js';
+export * from './storage/persistence.js';
 export * from './data/provenance.js';
+export * from './data/data-manifest.js';
 export * from './data/official-2026.js';
 export * from './data/military-2026.js';
 export * from './data/physician-baselines.js';
@@ -38,3 +41,5 @@ export * from './model/snapshots.js';
 export * from './model/timeline.js';
 export * from './model/explainability.js';
 export * from './model/financial-life.js';
+export * from './model/production-model.js';
+export * from './model/reproducibility.js';
