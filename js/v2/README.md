@@ -28,6 +28,8 @@ Each unified annual result contains normalized ages/careers, income, taxes, spen
 
 Validation errors prevent simulation. Reconciliation failures are simulation failures. Warnings permit deterministic continuation with degraded/projected assumptions. Ordinary financial infeasibility is a decision result, not an exception. `needsUserChoice` leaves an action unexecuted unless a visible named fallback policy explicitly selects a baseline.
 
+The V2.1 production interface is isolated at `/v2/`. It consumes only the exported V2.0 production boundaries, keeps incomplete models behind readiness gating, and presents Overview, Timeline, and Model views without changing financial semantics.
+
 Run `npm test` for deterministic fixtures. Run `npm run v2:fixture -- --year=2032` for the 2026–2038 golden-household summary. Run `npm run v2:property-fixture -- --year=2034` for the 2030–2039 property lifecycle. Run `npm run v2:goal-fixture -- --year=2040` for the 2036–2041 long-term-home lifecycle and generic goal-priority fixture. Run `npm run v2:financial-life -- 2039` for the authoritative 2026–2042 integrated fixture.
 
 Milestone 6 freezes the V2.0 engine behind a production model-document boundary. `createBaselineModel` creates structure without inventing personal facts; `assessSimulationReadiness` distinguishes a valid document from a configured simulation. Canonical JSON, semantic fingerprints, sequential migrations, an injected persistence adapter, import/export, run manifests, replay, audit, and model-health APIs are all independent of the UI and browser storage implementation. Use `npm run v2:model -- <baseline|validate|export|import|run|manifest|replay>` for developer inspection.

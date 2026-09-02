@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#09090b">
+  <title>Life & Wealth — V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <a class="skip-link" href="#app-main">Skip to content</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#overview" aria-label="Life and Wealth V2 home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span><strong>Life &amp; Wealth</strong><small>Financial life model · V2</small></span>
+      </a>
+      <div class="topbar-context" aria-live="polite">
+        <div><span>Selected period</span><strong id="shell-period">Not configured</strong></div>
+        <button class="health-pill" id="health-button" type="button" data-view-target="model">
+          <span aria-hidden="true"></span><span id="shell-health">No model</span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="primary-nav" aria-label="Primary navigation">
+      <a href="#overview" data-route="overview">Overview</a>
+      <a href="#timeline" data-route="timeline">Timeline</a>
+      <a href="#model" data-route="model">Model</a>
+    </nav>
+
+    <main id="app-main" tabindex="-1">
+      <div id="app-view" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <input id="model-file" type="file" accept="application/json,.json" hidden>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
