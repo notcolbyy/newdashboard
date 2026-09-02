@@ -6,7 +6,8 @@
     "test": "node --test js/v2/tests/*.test.js",
     "v2:fixture": "node js/v2/dev/run-fixture.js",
     "v2:property-fixture": "node js/v2/dev/run-property-fixture.js",
-    "v2:goal-fixture": "node js/v2/dev/run-goal-fixture.js"
+    "v2:goal-fixture": "node js/v2/dev/run-goal-fixture.js",
+    "v2:financial-life": "node js/v2/dev/run-financial-life-fixture.js"
   },
   "engines": { "node": ">=20" }
 }

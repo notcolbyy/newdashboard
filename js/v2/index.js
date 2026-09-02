@@ -33,3 +33,8 @@ export * from './model/property-lifecycle.js';
 export * from './model/goals.js';
 export * from './model/home-goal.js';
 export * from './model/simulate-goals.js';
+export * from './model/event-order.js';
+export * from './model/snapshots.js';
+export * from './model/timeline.js';
+export * from './model/explainability.js';
+export * from './model/financial-life.js';
