@@ -1,7 +1,7 @@
 export const SCHEMA_VERSION='2.0.0';
 export const MODEL_VERSION='2.0.0-m4';
 export const FINAL_MODEL_VERSION='2.0.0';
-export const OUTPUT_CONTRACT_VERSION='2.0.0';
+export const OUTPUT_CONTRACT_VERSION='2.0.1';
 
 export const ASSUMPTION_CLASSIFICATIONS=Object.freeze(['userEntered','researchedOfficial','researchedEstimate','planningDefault','scenarioControlled','eventDriven','derived','projected','official','estimated','scenarioAdjusted']);
 const ACCOUNT_TYPES=new Set(['generalCash','emergencyReserve','goalCash','taxableInvestment','retirementInvestment']);

@@ -3,7 +3,7 @@ import { FINAL_MODEL_VERSION, OUTPUT_CONTRACT_VERSION, SCHEMA_VERSION } from '..
 import { buildDataManifest } from '../data/data-manifest.js';
 import { modelFingerprint, stableFingerprint } from '../storage/canonical.js';
 
-export const ENGINE_VERSION='v2.0.0';
+export const ENGINE_VERSION='v2.0.1';
 export const REPLAY_GUARANTEE='Identical canonical input and normalized data reproduce identical financial output within the same supported engine and model version.';
 
 export function resultFingerprint(result){return stableFingerprint({metadata:{schemaVersion:result.metadata.schemaVersion,modelVersion:result.metadata.modelVersion,baseCurrencyYear:result.metadata.baseCurrencyYear,deterministic:result.metadata.deterministic},years:result.years,timeline:result.timeline,timelineDeltas:result.timelineDeltas,realizedEvents:result.realizedEvents,decisions:result.decisions,goalResults:result.goalResults,goals:result.goals,warnings:result.warnings,errors:result.errors,invariants:result.invariants});}

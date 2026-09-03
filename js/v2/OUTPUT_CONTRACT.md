@@ -1,6 +1,6 @@
 # V2 authoritative output contract
 
-Contract version: **2.0.0**
+Contract version: **2.0.1**
 
 V2.0 fields documented here are stable for UI consumers. Additive fields may be introduced without changing the major contract version. Renames, removals, unit changes, or semantic changes require a breaking contract version, calculation `modelVersion` review, regression tests, and migration review when persisted input is affected.
 
@@ -70,6 +70,8 @@ Each property row carries status, ownership, status history, valuation, authorit
 
 Goal rows expose status, real/nominal target, funded/permitted amounts, shortfall, possible/comfortable flags, blockers, funding plan, and next reevaluation. Decisions contain stable IDs, rules, actuals, thresholds, shortfalls, primary/secondary blockers, explanations, and resulting entity/event references when executed.
 
+Applicable home-goal decisions include `strategyComparison` when alternative property strategies were evaluated. This additive 2.0.1 field contains `status`, `needsUserChoice`, `explanation`, and the already-calculated authoritative `evaluations`. Each evaluation retains its stable `strategyId`, funding, reserve, housing-burden, cash-flow, retained/sale-property, net-sale-proceeds, rental-cash-flow, and blocker results. Evaluation order is not an optimization ranking, and no strategy is recommended automatically. The field is omitted when no alternatives were evaluated.
+
 An unresolved `needsUserChoice` remains unexecuted unless `metadata.unresolvedChoicePolicy` names an explicit baseline fallback. The engine never chooses by maximizing terminal wealth.
 
 ## Timeline and explanations
@@ -97,3 +99,8 @@ The top-level `invariants.passes` is true only when every annual invariant passe
 ## Reproducibility boundary
 
 `simulateReproducibly` wraps the authoritative simulation with a run manifest containing engine, model, schema, output-contract, input, assumption, and normalized-data identities. `schemaVersion` describes persisted structure; `modelVersion` describes calculation behavior. Replay is guaranteed only while the matching engine/model version and normalized datasets remain supported.
+
+## Version history
+
+- `2.0.1`: Additively exposes already-calculated home-goal strategy comparisons. Financial semantics and persisted schema remain `2.0.0`; engine implementation identity is `v2.0.1` because authoritative output fingerprints intentionally change.
+- `2.0.0`: Initial frozen V2.0 authoritative output contract.
