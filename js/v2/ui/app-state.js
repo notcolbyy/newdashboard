@@ -1,7 +1,7 @@
 const allowedViews=new Set(['overview','timeline','model']);
 
 export function createAppStore(initial={}){
-  let state={activeView:'overview',model:null,loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};
+  let state={activeView:'overview',model:null,editor:null,setupSection:'setup',loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};
   const listeners=new Set();
   const getState=()=>state;
   const setState=patch=>{state={...state,...(typeof patch==='function'?patch(state):patch)};for(const listener of listeners)listener(state);return state;};
