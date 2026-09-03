@@ -1,10 +1,8 @@
 import { escapeHtml, formatCurrency, formatPercent, titleCase } from './formatting.js';
 import { referenceAge } from './app-state.js';
-import { periodExplorerMarkup, reconciliationBadge, financialRows, modelScopeNote } from './analysis-shared.js';
+import { periodExplorerMarkup, reconciliationBadge, financialRows, modelScopeNote, statusTag } from './analysis-shared.js';
 
 const PRIORITY={hard:0,protected:1,important:2,optional:3};
-const statusTag=status=>`<span class="status-tag ${String(status).toLowerCase()}">${escapeHtml(titleCase(status))}</span>`;
-
 export function goalsViewModel({row,simulation,selectedGoalId}){
   const records=[...(simulation.goals??[])].filter(goal=>goal.enabled!==false).sort((a,b)=>(PRIORITY[a.priority]??9)-(PRIORITY[b.priority]??9)||(a.priorityOrder??999)-(b.priorityOrder??999)||a.id.localeCompare(b.id));
   const annual=new Map((row.goals??[]).map(goal=>[goal.goalId,goal])),selectedRecord=records.find(goal=>goal.id===selectedGoalId)??records[0]??null,result=selectedRecord?annual.get(selectedRecord.id)??null:null,decision=result?.decisionId?(row.decisions??[]).find(item=>item.id===result.decisionId)??(simulation.decisions??[]).find(item=>item.id===result.decisionId):null;

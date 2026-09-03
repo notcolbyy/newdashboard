@@ -1,8 +1,10 @@
-const currencyFull=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+const currencyWhole=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+const currencyExact=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 const numberCompact=new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1});
-export const formatCurrency=(cents,{compact=false,unavailable='—'}={})=>Number.isSafeInteger(cents)?(compact?`${cents<0?'-':''}$${numberCompact.format(Math.abs(cents)/100)}`:currencyFull.format(cents/100)):unavailable;
+export const formatCurrency=(cents,{compact=false,exact=false,unavailable='—'}={})=>Number.isSafeInteger(cents)?(compact?`${cents<0?'-':''}$${numberCompact.format(Math.abs(cents)/100)}`:(exact?currencyExact:currencyWhole).format(Object.is(cents,-0)?0:cents/100)):unavailable;
 export const formatSignedCurrency=cents=>Number.isSafeInteger(cents)?`${cents>0?'+':''}${formatCurrency(cents,{compact:true})}`:'—';
 export const formatPercent=value=>Number.isFinite(value)?new Intl.NumberFormat('en-US',{style:'percent',maximumFractionDigits:1}).format(value):'—';
+export const formatPercentagePoints=value=>Number.isFinite(value)?`${value>0?'+':''}${new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(value*100)} pp`:'—';
 export const titleCase=value=>String(value??'').replace(/([a-z])([A-Z])/g,'$1 $2').replaceAll(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 export const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 export const formatDate=value=>value?new Intl.DateTimeFormat('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(`${value}T00:00:00Z`)):'Not scheduled';

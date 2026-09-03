@@ -1,9 +1,8 @@
 import { escapeHtml, formatCurrency, titleCase } from './formatting.js';
 import { referenceAge } from './app-state.js';
-import { periodExplorerMarkup, ownerLabels, ownershipLabel, reconciliationBadge, financialRows, modelScopeNote } from './analysis-shared.js';
+import { periodExplorerMarkup, ownerLabels, ownershipLabel, reconciliationBadge, financialRows, modelScopeNote, statusTag } from './analysis-shared.js';
 
 const held=property=>property.status!=='sold';
-const statusTag=status=>`<span class="status-tag ${String(status).toLowerCase()}">${escapeHtml(titleCase(status))}</span>`;
 const propertyIdFromDecision=decision=>decision.propertyId??decision.target??decision.intentId?.replace(/-intent$/,'')??null;
 
 export function realEstateViewModel({row,simulation,model,selectedPropertyId}){
