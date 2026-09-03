@@ -6,6 +6,8 @@ The persisted model is JSON-compatible input, not a cached simulation. `schemaVe
 
 `createBaselineModel()` supplies entity structure, named policies, editable planning conventions, and provenance. Unknown personal facts remain `null` with an explicit `intentionallyUnset` state. A baseline can be structurally valid while `assessSimulationReadiness()` reports `INCOMPLETE_CONFIGURATION`.
 
+People with `enabled: false` remain in the persisted document but are inactive simulation participants. They do not require birth timing and do not contribute ages, careers, compensation, taxes, or household participation until enabled. The simulation always requires one active reference person; enabling another person restores the applicable birth-date, birth-year, or age-offset requirements.
+
 ## Canonical form and identity
 
 Serialization sorts object keys and preserves array order so round trips are lossless. The semantic model fingerprint additionally sorts identity-based collections (`people`, `accounts`, `liabilities`, `assets`, `properties`, `propertyIntents`, `careers`, `serviceHistories`, `plannedEvents`, and `goals`) by ID. Ordered calculation arrays remain ordered. Save timestamps and presentation-only extensions are excluded from financial identity.
@@ -21,4 +23,3 @@ The adapter receives a storage implementation; model code never accesses browser
 Migrations are sequential, immutable, deterministic, preserve unknown fields, and report introduced defaults. Unknown future schemas fail closed. Import never writes storage.
 
 Replay is guaranteed only with the same supported engine/model version and the same normalized-data fingerprint. The manifest records model, assumption, data, and output fingerprints. A future build that no longer ships the historical engine reports `UNSUPPORTED_VERSION` instead of approximating the old result.
-

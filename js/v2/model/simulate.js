@@ -17,7 +17,8 @@ export function simulate(model,{taxTables={}}={}){
   for(const year of years){
     const openingAccounts=Object.fromEntries(accountState),openingLiabilities=Object.fromEntries(liabilityState);
     const cashAccount=model.accounts.find(a=>a.type==='generalCash');if(!cashAccount)throw new TypeError('A generalCash account is required.');
-    const cashSources=model.income.filter(e=>ACTIVE(e,year)).map(e=>({id:e.id,type:e.type??'income',amountCents:e.amountCents,taxable:e.taxable!==false,ownerId:e.ownerId}));
+    const activePersonIds=new Set(people.map(person=>person.id));
+    const cashSources=model.income.filter(e=>ACTIVE(e,year)&&(e.ownerId==='household'||activePersonIds.has(e.ownerId))).map(e=>({id:e.id,type:e.type??'income',amountCents:e.amountCents,taxable:e.taxable!==false,ownerId:e.ownerId}));
     const cashUses=model.spending.filter(e=>ACTIVE(e,year)).map(e=>({id:e.id,type:e.type??'spending',amountCents:e.amountCents}));
     const liabilityChanges=[];for(const liability of model.liabilities){const scheduledPaymentCents=(liability.scheduledPayments??[]).filter(e=>e.year===year).reduce((s,e)=>s+e.amountCents,0),extraPrincipalCents=(liability.extraPrincipalPayments??[]).filter(e=>e.year===year).reduce((s,e)=>s+e.amountCents,0),change=calculateLiabilityYear({...liability,openingBalanceCents:liabilityState.get(liability.id),scheduledPaymentCents,extraPrincipalCents});liabilityState.set(liability.id,change.closingBalanceCents);liabilityChanges.push(change);if(change.totalPaymentCents)cashUses.push({id:`liability:${liability.id}`,type:'debtPayment',amountCents:change.totalPaymentCents});}
     const yearEvents=planned.filter(e=>Number(e.resolvedDate.slice(0,4))===year);for(const event of yearEvents)realizedEvents.push(realizeEvent(event,event.resolvedDate));

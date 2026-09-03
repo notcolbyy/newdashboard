@@ -1,0 +1,29 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import { createBaselineModel, assessSimulationReadiness, resolvePeople, simulateFinancialLife, simulateHousehold } from '../index.js';
+import { goldenProductionFixture } from './golden-production-fixture.js';
+import { goldenHouseholdFixture } from './golden-household-fixture.js';
+import { goldenIntegratedFixture } from './golden-integrated-fixture.js';
+
+const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+function configuredSinglePersonBaseline(){
+  const model=createBaselineModel(),{data,taxTables}=goldenProductionFixture();
+  model.people[0].birthDate='2004-04-15';model.people[0].inputState='entered';
+  model.household.simulationStartYear=2026;model.household.simulationEndYear=2028;model.household.filingStatus='single';
+  for(const account of model.accounts)account.openingBalanceCents=0;
+  model.careers=[{id:'reference-work',personId:'reference',careerType:'genericEmployment',role:'Employment',startDate:'2026-01-01',endDate:'2029-01-01',compensationRule:{annualCents:6_000_000,baseYear:2026,annualGrowth:0}}];
+  return{model,data,taxTables};
+}
+
+test('production baseline preserves its intentionally disabled partner',()=>{const model=createBaselineModel(),partner=model.people.find(person=>person.id==='partner');assert.equal(partner.enabled,false);assert.equal(partner.birthDate,null);assert.equal(partner.birthYear,null);assert.equal(partner.ageOffsetFromReference,null);});
+test('disabled people are excluded at the shared calendar boundary',()=>{const people=resolvePeople([{id:'reference',isReference:true,birthDate:'2000-01-01'},{id:'partner',enabled:false,birthDate:null,birthYear:null,ageOffsetFromReference:null}]);assert.deepEqual(people.map(person=>person.id),['reference']);});
+test('configured production baseline simulates with only its active reference person',()=>{const fixture=configuredSinglePersonBaseline(),readiness=assessSimulationReadiness(fixture.model),result=simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables});assert.equal(readiness.ready,true);assert.equal(result.metadata.valid,true);assert.equal(result.invariants.passes,true);assert.ok(result.years.every(year=>Object.keys(year.ages).join(',')==='reference'));});
+test('disabled partner creates no career, compensation, tax, or timeline participation',()=>{const fixture=configuredSinglePersonBaseline();fixture.model.careers.push({id:'disabled-work',personId:'partner',careerType:'genericEmployment',role:'Disabled career',startDate:'2026-01-01',endDate:'2029-01-01',compensationRule:{annualCents:99_000_000,baseYear:2026,annualGrowth:0}});const result=simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables});assert.ok(result.years.every(year=>year.income.records.every(record=>record.personId!=='partner')));assert.ok(result.years.every(year=>year.careers.every(stage=>stage.personId!=='partner')));assert.ok(result.timeline.every(item=>item.personId!=='partner'));});
+test('enabling partner restores a structured timing requirement',()=>{const {model}=configuredSinglePersonBaseline();model.people.find(person=>person.id==='partner').enabled=true;const readiness=assessSimulationReadiness(model);assert.equal(readiness.ready,false);assert.ok(readiness.missing.some(item=>item.code==='PERSON_TIMING_REQUIRED'&&item.entityId==='partner'));});
+test('enabled partner with an age offset participates normally',()=>{const fixture=configuredSinglePersonBaseline(),partner=fixture.model.people.find(person=>person.id==='partner');partner.enabled=true;partner.ageOffsetFromReference=-2;const result=simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables});assert.equal(result.metadata.valid,true);assert.ok(result.years.every(year=>Number.isInteger(year.ages.partner)));});
+test('disabled events do not force disabled-person resolution',()=>{const fixture=configuredSinglePersonBaseline();fixture.model.plannedEvents.push({id:'inactive-partner-event',enabled:false,type:'career.stage.start',personId:'partner',age:25,title:'Inactive'});assert.doesNotThrow(()=>simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables}));});
+test('active events targeting disabled people retain the existing missing-person failure',()=>{const fixture=configuredSinglePersonBaseline();fixture.model.plannedEvents.push({id:'active-partner-event',type:'career.stage.start',personId:'partner',age:25,title:'Active'});assert.throws(()=>simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables}),/references missing person partner/);});
+test('disabled reference person is rejected instead of silently replaced',()=>{const model=createBaselineModel();model.people[0].enabled=false;model.people[1].enabled=true;model.people[1].birthDate='2004-01-01';const readiness=assessSimulationReadiness(model);assert.equal(readiness.status,'INVALID');assert.ok(readiness.errors.some(error=>error.code==='REFERENCE_PERSON_ACTIVE_REQUIRED'));assert.throws(()=>resolvePeople(model.people),/active reference person/);});
+test('successful two-person household fixture result remains byte-identical',()=>{const fixture=goldenHouseholdFixture(),result=simulateHousehold(fixture.model,{data:fixture.data,taxTables:fixture.taxTables});assert.equal(hash(result),'953124826b4245bc1f0e142e22418355ab5378ce097e412c48dbcedbc78e81bb');});
+test('successful integrated fixture result remains byte-identical',()=>{const fixture=goldenIntegratedFixture(),result=simulateFinancialLife(fixture.model,{data:fixture.data,taxTables:fixture.taxTables});assert.equal(hash(result),'799f8bd288c743efc6d1e1da4b4f120041dbf45ac196faf59ed9041f4ad23797');assert.equal(result.invariants.passes,true);});

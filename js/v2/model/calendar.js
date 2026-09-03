@@ -20,9 +20,10 @@ export function ageOnDate(person, date) {
 }
 
 export function resolvePeople(people) {
-  const reference = people.find(person=>person.isReference) ?? people[0];
-  if (!reference) throw new TypeError('At least one person is required.');
-  return people.map(person=>{
+  const activePeople = people.filter(person=>person.enabled!==false);
+  const reference = activePeople.find(person=>person.isReference);
+  if (!reference) throw new TypeError('An active reference person is required.');
+  return activePeople.map(person=>{
     if (person.birthDate || Number.isInteger(person.birthYear)) return {...person};
     if (!Number.isInteger(person.ageOffsetFromReference)) throw new TypeError(`Person ${person.id} requires birth information or age offset.`);
     if (reference.birthDate) {
