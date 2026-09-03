@@ -1,4 +1,4 @@
-const allowedViews=new Set(['overview','timeline','model']);
+const allowedViews=new Set(['overview','cash-flow','assets','timeline','model']);
 
 export function createAppStore(initial={}){
   let state={activeView:'overview',model:null,editor:null,setupSection:'setup',loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};

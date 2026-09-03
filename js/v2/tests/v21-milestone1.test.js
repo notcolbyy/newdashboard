@@ -12,7 +12,7 @@ import { goldenProductionFixture, priorSchemaFixture } from './golden-production
 
 const fixture=()=>goldenProductionFixture();
 
-test('V2 route parser exposes only Overview, Timeline, and Model',()=>{assert.equal(routeFromHash('#overview'),'overview');assert.equal(routeFromHash('#timeline'),'timeline');assert.equal(routeFromHash('#model'),'model');assert.equal(routeFromHash('#goals'),'overview');});
+test('V2 route parser preserves implemented routes and rejects unfinished routes',()=>{assert.equal(routeFromHash('#overview'),'overview');assert.equal(routeFromHash('#cash-flow'),'cash-flow');assert.equal(routeFromHash('#assets'),'assets');assert.equal(routeFromHash('#timeline'),'timeline');assert.equal(routeFromHash('#model'),'model');assert.equal(routeFromHash('#goals'),'overview');});
 test('new model uses production baseline and remains intentionally incomplete',()=>{const created=createNewModel();assert.equal(created.readiness.status,'INCOMPLETE_CONFIGURATION');assert.equal(created.model.people[0].birthDate,null);assert.equal(created.model.careers.length,0);});
 test('no saved model is an explicit entry state',()=>{const result=loadSavedModel(createMemoryStorage());assert.equal(result.loadState,'NO_MODEL');assert.equal(result.model,undefined);});
 test('valid saved model loads through production persistence',()=>{const storage=createMemoryStorage(),{model}=fixture();persistModel(storage,model);const result=loadSavedModel(storage);assert.ok(result.model);assert.equal(result.validation.valid,true);});
