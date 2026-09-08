@@ -1,3 +1,4 @@
+import { militaryReadinessIssues } from './military-readiness.js';
 export const SCHEMA_VERSION='2.0.0';
 export const MODEL_VERSION='2.0.0-m4';
 export const FINAL_MODEL_VERSION='2.0.0';
@@ -58,7 +59,7 @@ function rate(value,path,id,errors,min,max){if(value!=null&&(!Number.isFinite(va
 function provenance(id,record,errors,warnings){const path=`provenance.${id}`,kind=record?.classification;if(!ASSUMPTION_CLASSIFICATIONS.includes(kind)){errors.push(err('PROVENANCE_CLASSIFICATION_INVALID',`${path}.classification`,'Unsupported assumption classification.',ASSUMPTION_CLASSIFICATIONS,kind,id));return;}if(['official','researchedOfficial'].includes(kind)&&(!record.source?.url||String(record.source.url).startsWith('model://')||!record.sourceType||record.editable!==false))errors.push(err('OFFICIAL_PROVENANCE_INVALID',path,'Official values require a non-model source, source type, and editable=false.',undefined,record,id));if(kind==='projected'&&record.state==='official')errors.push(err('PROJECTED_LABELED_OFFICIAL',`${path}.state`,'Projected values cannot be labeled official.','projected',record.state,id));if(kind==='derived'&&!record.derivedFrom&&!record.ruleId)errors.push(err('DERIVATION_TRACE_REQUIRED',path,'Derived values require derivedFrom or ruleId.',undefined,record,id));if(!record.unit)warnings.push(warn('PROVENANCE_UNIT_MISSING',`${path}.unit`,'Material provenance record does not identify its unit.',undefined,record.unit,id));}
 function materialProvenance(model,warnings){const registry=model.provenance??{};for(const entity of [...(model.accounts??[]),...(model.liabilities??[]),...(model.careers??[]),...(model.propertyIntents??[]),...(model.goals??[]),...(model.spendingSchedules??[])]){const ids=entity.provenanceIds??(entity.provenanceId?[entity.provenanceId]:[]);if(!ids.length&&entity.classification&&entity.classification!=='userEntered')warnings.push(warn('MATERIAL_PROVENANCE_INCOMPLETE',entity.id,'Material configured input has no provenance reference.',undefined,entity.classification,entity.id));for(const id of ids)if(!registry[id])warnings.push(warn('PROVENANCE_REFERENCE_MISSING',`${entity.id}.provenanceIds`,'Referenced provenance is not embedded in this model payload.',undefined,id,entity.id));}}
 
-export function assessSimulationReadiness(model){
+export function assessSimulationReadiness(model,options={}){
   const validation=validateModelDocument(model,{provenanceCompleteness:true,strictReferences:true}),missing=[],reference=(model.people??[]).find(x=>x.isReference&&x.enabled!==false);
   if(reference&&(reference.birthDate==null&&!Number.isInteger(reference.birthYear)))missing.push({code:'REFERENCE_BIRTH_REQUIRED',path:'people.reference.birthDate',message:'Reference birth date or birth year is required.'});
   for(const person of (model.people??[]).filter(x=>x.enabled!==false&&!x.isReference))if(person.birthDate==null&&!Number.isInteger(person.birthYear)&&!Number.isInteger(person.ageOffsetFromReference))missing.push({code:'PERSON_TIMING_REQUIRED',path:`people.${person.id}`,entityId:person.id,message:`Birth date, birth year, or age offset is required for enabled person ${person.name??person.id}.`});
@@ -67,5 +68,6 @@ export function assessSimulationReadiness(model){
   if(!model.household?.filingStatus)missing.push({code:'FILING_STATUS_REQUIRED',path:'household.filingStatus',message:'Initial filing status is required.'});
   for(const account of model.accounts??[])if(account.openingBalanceCents===null)missing.push({code:'STARTING_BALANCE_REQUIRED',path:`accounts.${account.id}.openingBalanceCents`,entityId:account.id,message:`Starting balance for ${account.name??account.id} is required, including zero.`});
   if(!(model.careers??[]).length)missing.push({code:'CAREER_TIMING_REQUIRED',path:'careers',message:'At least one career or income stage is required.'});
+  missing.push(...militaryReadinessIssues(model,options));
   const status=!validation.valid?'INVALID':missing.length?'INCOMPLETE_CONFIGURATION':validation.warnings.length?'READY_WITH_WARNINGS':'READY';return{status,ready:['READY','READY_WITH_WARNINGS'].includes(status),missing,errors:validation.errors,warnings:validation.warnings};
 }
