@@ -24,7 +24,17 @@ export function buildCashFlowSnapshot({householdYear,propertyYear,goalFundingCen
   const spending={essentialCents:householdYear.spending.essentialCents,discretionaryCents:householdYear.spending.discretionaryCents,oneTimeCents:householdYear.spending.oneTimeCents,ownerOccupiedPropertyCents:propertyPrimaryCents,rentalPropertyCents:rentalCostsCents,totalHouseholdSpendingCents:householdYear.spending.totalCents};
   const debt={interestCents:householdYear.debt.interestCents+sumCents((propertyYear?.propertyResults??[]).map(p=>p.mortgage?.interestCents??0)),principalCents:householdYear.debt.principalCents+sumCents((propertyYear?.propertyResults??[]).map(p=>p.mortgage?.principalCents??0)),debtServiceCents:sumCents(householdYear.debt.changes.map(d=>d.totalPaymentCents))+sumCents((propertyYear?.propertyResults??[]).map(p=>p.mortgage?.paymentsCents??0))};
   const allocation={reserveRestorationCents:householdYear.allocation.reserveRestorationCents,taxableInvestingCents:householdYear.allocation.taxableInvestmentCents,employeeRetirementCents:householdYear.allocation.employeeRetirementCents,employerGovernmentRetirementCents:householdYear.allocation.employerGovernmentRetirementCents,goalFundingCents,retainedCashCents:householdYear.allocation.retainedCashCents};
-  const freeCashFlowCents=householdYear.income.cashCompensationCents-householdYear.taxes.totalTaxCents-householdYear.spending.totalCents-sumCents(householdYear.debt.changes.map(d=>d.totalPaymentCents))-householdYear.allocation.employeeRetirementCents;
+  // Property lifecycle already posts these amounts to cash. This statement
+  // classifies those same postings; it must not post them a second time.
+  const originalHousingCents=sumCents((householdYear.spending.entries??[]).filter(e=>e.category==='housing').map(e=>e.amountCents));
+  const actualGenericHousingCents=propertyYear?sumCents(propertyYear.cashUses.filter(e=>e.type==='genericHousing').map(e=>e.amountCents)):originalHousingCents;
+  const transactionExpensesCents=sumCents((propertyYear?.portfolio.purchases??[]).map(p=>p.closingCostsCents+p.setupCostsCents))+sumCents((propertyYear?.portfolio.sales??[]).map(s=>s.sellingCostsCents));
+  const cashInterestCents=sumCents((householdYear.reconciliation?.cash.entries??[]).filter(e=>e.type==='cashInterest').map(e=>e.amountCents));
+  // Rental distributions are already net of operating expenses AND financing.
+  // Principal is required debt service in FCF, but a transfer in net worth.
+  // Investment/reserve funding, sale proceeds/payoff, and down payments are
+  // capital transfers. Only acquisition/sale transaction expenses enter FCF.
+  const freeCashFlowCents=householdYear.income.cashCompensationCents+cashInterestCents+income.rentalDistributionsCents-householdYear.taxes.totalTaxCents-householdYear.spending.totalCents+originalHousingCents-actualGenericHousingCents-propertyPrimaryCents-sumCents(householdYear.debt.changes.map(d=>d.totalPaymentCents))-transactionExpensesCents;
   const assetTransactions={propertySaleGrossProceedsCents:sumCents((propertyYear?.cashSources??[]).filter(e=>e.type==='propertySalePrice').map(e=>e.amountCents)),releasedPropertyReservesCents:sumCents((propertyYear?.cashSources??[]).filter(e=>e.type==='propertyReserveRelease').map(e=>e.amountCents))};
   return{income,taxes,spending,debt,allocation,assetTransactions,freeCashFlowCents,definition:'Cash remaining after taxes, modeled spending, required debt service, and required one-time expenses, before optional investing and goals.'};
 }
