@@ -43,3 +43,5 @@ export * from './model/explainability.js';
 export * from './model/financial-life.js';
 export * from './model/production-model.js';
 export * from './model/reproducibility.js';
+export * from './templates/planning-template.js';
+export * from './templates/example-plan.js';
