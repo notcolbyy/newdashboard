@@ -4,7 +4,7 @@ export function createAppStore(initial={}){
   let state={exampleMode:false,exampleReturn:null,candidateReturn:null,templateReview:false,activeView:'overview',model:null,editor:null,setupSection:'setup',loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,selectedPropertyId:null,selectedGoalId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};
   const listeners=new Set();
   const getState=()=>state;
-  const setState=patch=>{state={...state,...(typeof patch==='function'?patch(state):patch)};for(const listener of listeners)listener(state);return state;};
+  const setState=(patch,{notify=true}={})=>{state={...state,...(typeof patch==='function'?patch(state):patch)};if(notify)for(const listener of listeners)listener(state);return state;};
   const api={getState,setState,subscribe(listener){listeners.add(listener);return()=>listeners.delete(listener);},setView(view){return setState({activeView:allowedViews.has(view)?view:'overview'});},setSelectedYear(year,{notify=true}={}){const years=state.simulation?.years??[];if(!years.length)return state;const bounded=Math.min(years.at(-1).year,Math.max(years[0].year,Number(year)));if(notify)return setState({selectedYear:bounded});state={...state,selectedYear:bounded};return state;},selectTimeline(item){const date=item?.realizedDate??item?.plannedDate,year=Number(String(date??'').slice(0,4));return setState({selectedTimelineItemId:item?.id??null,...(Number.isInteger(year)?{selectedYear:year}:{})});},selectProperty(id){return setState({selectedPropertyId:id??null});},selectGoal(id){return setState({selectedGoalId:id??null});}};
   return api;
 }

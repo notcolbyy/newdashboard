@@ -1,3 +1,4 @@
+import {lifeMilestones,lifeTimelineMarkup,compositionMarkup,planAtGlanceMarkup} from './life-story.js';
 import { escapeHtml, formatCurrency, formatSignedCurrency, titleCase } from './formatting.js';
 import { referenceAge } from './app-state.js';
 import { periodExplorerMarkup, warningSummaryMarkup } from './analysis-shared.js';
@@ -13,11 +14,11 @@ export function overviewMarkup({row,simulation,model}){
 }
 
 export function overviewBodyMarkup({row,simulation,model}){
-  const age=referenceAge(row,model),context=row.careers?.map(c=>c.role).join(' · ')||'No active career stage',bs=row.balanceSheet,cf=row.cashFlow,milestone=row.nextMajorMilestone;
+  const age=referenceAge(row,model),context=row.careers?.map(c=>c.role).join(' · ')||model.extensions?.production?.template?.education?.filter(ed=>ed.personId===model.people.find(p=>p.isReference)?.id&&age>=ed.startAge&&age<ed.endAge).map(ed=>ed.stage+' · planned').join(' · ')||'No active career stage',bs=row.balanceSheet,cf=row.cashFlow,milestone=row.nextMajorMilestone,chapter=lifeMilestones(model,simulation).find(c=>c.year>row.year);
   const deltas=meaningfulDeltas(row),drivers=[...(row.netWorthDecomposition?.components??[])].filter(x=>x.economicEffectCents!==0).sort((a,b)=>Math.abs(b.economicEffectCents)-Math.abs(a.economicEffectCents)).slice(0,4);
   return `<div class="overview-grid">
       <section class="panel hero-overview"><div class="hero-copy"><p class="eyebrow">Selected chapter</p><div class="hero-age" aria-hidden="true">${age}</div><h1 id="overview-title">${escapeHtml(context)}</h1><p class="hero-context">Calendar year ${row.year} · Overview balances are shown in nominal modeled dollars.</p></div>
-      <aside class="milestone"><span class="section-label">Next major milestone</span>${milestone?`<strong>${escapeHtml(milestone.description)}</strong><time datetime="${escapeHtml(milestone.targetDate)}">Age ${milestone.age} · ${milestone.targetYear} · ${milestone.yearsAway} year${milestone.yearsAway===1?'':'s'} away</time>`:'<strong>No later major milestone is currently modeled.</strong><span class="muted">Additions belong in the future model editor.</span>'}</aside></section>
+      <aside class="milestone"><span class="section-label">Next major milestone</span>${chapter?`<strong>${escapeHtml(chapter.title)}</strong><span>${escapeHtml(chapter.status)} · ${chapter.year} · age ${chapter.year-(row.year-age)}</span>`:milestone?`<strong>${escapeHtml(milestone.description)}</strong><time datetime="${escapeHtml(milestone.targetDate)}">Age ${milestone.age} · ${milestone.targetYear} · ${milestone.yearsAway} year${milestone.yearsAway===1?'':'s'} away</time>`:'<strong>No later major milestone is currently modeled.</strong><span class="muted">Additions belong in the future model editor.</span>'}</aside></section>
       <div class="metrics">
         ${metric('Total net worth',formatCurrency(bs.totalNetWorthCents,{compact:true}),'All modeled assets minus liabilities.','assets')}
         ${metric('Liquid net worth',formatCurrency(bs.liquidNetWorthCents,{compact:true}),'Cash and marketable taxable assets, less immediate unsecured debt.','assets')}
@@ -27,11 +28,14 @@ export function overviewBodyMarkup({row,simulation,model}){
         ${metric('Investable net worth',formatCurrency(bs.investableNetWorthCents,{compact:true}),'Cash and marketable investment accounts.','assets')}
       </div>
       <section class="panel panel-pad trajectory"><div class="panel-header"><div><p class="section-label">Wealth trajectory</p><h2>Modeled household wealth</h2><p>Nominal dollars · selected age highlighted</p></div><div class="chart-legend"><span>Total net worth</span><span>Liquid net worth</span></div></div><div class="chart-wrap" id="wealth-chart"></div></section>
+      ${lifeTimelineMarkup(model,simulation,row.year)}
+      ${compositionMarkup(row)}
       <div class="side-stack">
         <section class="panel panel-pad"><div class="panel-header"><div><p class="section-label">Year over year</p><h2>What changed</h2></div></div><div class="delta-list">${deltas.length?deltas.map(([label,value])=>`<div class="delta-item"><span>${label}</span><strong>${formatSignedCurrency(value)}</strong></div>`).join(''):'<p class="muted">This is the first modeled year, so no prior-year comparison exists.</p>'}</div></section>
         <section class="panel panel-pad"><div class="panel-header"><div><p class="section-label">Economic drivers</p><h2>What grew wealth</h2></div></div><div class="driver-list">${drivers.length?drivers.map(item=>`<div class="driver-item"><span>${escapeHtml(item.label??titleCase(item.type))}</span><strong>${formatSignedCurrency(item.economicEffectCents)}</strong></div>`).join(''):'<p class="muted">No material economic drivers are recorded for this year.</p>'}</div></section>
       </div>
-      <section class="panel panel-pad"><div class="panel-header"><div><p class="section-label">Model narrator</p><h2>Why this age matters</h2></div></div><div class="narrator-list">${row.narrator?.length?row.narrator.slice(0,4).map((item,index)=>`<div class="narrator-item"><span class="narrator-index">0${index+1}</span><p>${escapeHtml(item.text)}</p></div>`).join(''):'<div class="empty"><div><div class="empty-icon" aria-hidden="true">·</div><h3>A quieter year</h3><p>No material transition or warning was selected by the model narrator.</p></div></div>'}</div></section>
+      <section class="panel panel-pad"><div class="panel-header"><div><p class="section-label">Model narrator</p><h2>Why this age matters</h2></div></div><div class="narrator-list">${row.narrator?.length?row.narrator.slice(0,4).map((item,index)=>`<div class="narrator-item"><span class="narrator-index">0${index+1}</span><p>${escapeHtml(item.text.replace(/(-?\d+) cents/g,(_,n)=>formatCurrency(Number(n))))}</p></div>`).join(''):'<div class="empty"><div><div class="empty-icon" aria-hidden="true">·</div><h3>A quieter year</h3><p>No material transition or warning was selected by the model narrator.</p></div></div>'}</div></section>
+      ${planAtGlanceMarkup(model)}
       ${warningSummaryMarkup(row.warnings)}
     </div>`;
 }
