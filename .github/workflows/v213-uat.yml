@@ -1,6 +1,8 @@
 name: V2.1.3 UAT Verification
 
 on:
+  push:
+    branches: [v2.1.3-life-plan-uat]
   pull_request:
     branches: [main]
   workflow_dispatch:
