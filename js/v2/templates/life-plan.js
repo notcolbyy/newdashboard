@@ -5,7 +5,7 @@ import {parseMoneyInput,markUserEntered} from '../ui/editor-state.js';
 
 export function createLifePlan(){
   const m=createPlanningTemplate(),meta=m.extensions.production.template;
-  meta.name='Life Plan';meta.createdFrom='life-plan-v2.1.2';meta.horizonAge=95;
+  meta.name='Life Plan';meta.createdFrom='life-plan-v2.1.3';meta.horizonAge=95;meta.currentYear=2026;meta.currentChapter='Current high-school junior → UT Knoxville → law school → Air Force JAG';
   m.people[1].enabled=false;
   m.accounts.find(a=>a.id==='retirement-investments').name='Retirement investments / planned TSP';
   m.retirementPolicies={'planning-jag':{accountId:'retirement-investments',traditionalRate:.08,rothRate:.02}};
@@ -25,7 +25,7 @@ export function applyLifePlanInput(m,key,value){
   if(key==='birthYear'){
     const year=value===''?null:Number(value);if(year!==null&&(!Number.isInteger(year)||year<1900||year>new Date().getFullYear()))throw new TypeError('Enter a valid birth year.');
     m.people[0].birthDate=null;m.people[0].birthYear=year;m.people[0].inputState=year?'entered':'intentionallyUnset';
-    m.household.simulationStartYear=year?Math.max(2026,year+18):null;m.household.simulationEndYear=year?year+95:null;
+    m.household.simulationStartYear=year?(meta.currentYear??2026):null;m.household.simulationEndYear=year?year+95:null;
     for(const c of m.careers){c.startDate=null;c.endDate=null;}m.serviceHistories=[];
   }else if(key==='filingStatus')m.household.filingStatus=value||null;
   else if(key==='bah'){const career=m.careers.find(c=>c.id==='planning-jag');if(value==='')delete career.compensationRule.bahFallback;else {career.compensationRule.bahFallback??={baseYear:2026};configureMilitaryBahFallback(m,'planning-jag',parseMoneyInput(value));}}
