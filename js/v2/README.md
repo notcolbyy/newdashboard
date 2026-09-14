@@ -42,15 +42,20 @@ The UI is presentational. It may format, group, sort, and draw coordinates from 
 
 | Boundary | Version |
 | --- | --- |
-| Engine | `v2.0.1` |
+| Engine | `v2.0.3` |
 | Model | `2.0.0` |
 | Schema | `2.0.0` |
-| Output contract | `2.0.1` |
-| Interface release | `V2.1` |
+| Output contract | `2.0.2` |
+| Interface release | `V2.1.3` |
+
+
+### Life Plan first run
+
+The recommended **Start with Life Plan** path begins with the current high-school-junior chapter, a planned UT Knoxville undergraduate path, law school, Air Force JAG service, an optional pediatrics partner path, household/reserve structure, and the $1.5M long-term-home goal in 2025 dollars. It asks for only the production-required personal inputs: birth year, starting filing status, a user-entered BAH planning estimate, the optional-partner choice, and explicit opening account balances (including explicit zero). Unknown debt, duty station, property-transfer timing, marriage/tax timing, and later civilian work remain unresolved. The projection begins in 2026 and extends through reference age 95.
 
 ### Deployment verification
 
-Serve the repository root over HTTP, open `/v2/`, and verify all seven hash routes, create/load/import/export, the shared period control, cross-links, and the browser console. After pushing, confirm remote `main`, then confirm the deployed HTML references matching `app.css?v=2.1.5` and `app.js?v=2.1.5`. A stale Pages response is a propagation state, not permission to mix asset revisions.
+Serve the repository root over HTTP, open `/v2/`, and verify all seven hash routes, create/load/import/export, the shared period control, cross-links, and the browser console. After pushing, confirm remote `main`, then confirm the deployed HTML references matching `app.css?v=2.1.8` and `app.js?v=2.1.8`. A stale Pages response is a propagation state, not permission to mix asset revisions.
 
 ### Current limitations and deferred work
 
