@@ -1,6 +1,6 @@
 # V2 authoritative output contract
 
-Contract version: **2.0.1**
+Contract version: **2.0.2**
 
 V2.0 fields documented here are stable for UI consumers. Additive fields may be introduced without changing the major contract version. Renames, removals, unit changes, or semantic changes require a breaking contract version, calculation `modelVersion` review, regression tests, and migration review when persisted input is affected.
 
@@ -102,5 +102,6 @@ The top-level `invariants.passes` is true only when every annual invariant passe
 
 ## Version history
 
+- `2.0.2`: Represents non-finite housing-burden values as unavailable (`null`) when the income denominator is non-positive. Persisted model and schema versions remain `2.0.0`.
 - `2.0.1`: Additively exposes already-calculated home-goal strategy comparisons. Financial semantics and persisted schema remain `2.0.0`; engine implementation identity is `v2.0.1` because authoritative output fingerprints intentionally change.
 - `2.0.0`: Initial frozen V2.0 authoritative output contract.
