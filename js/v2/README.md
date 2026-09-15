@@ -55,7 +55,7 @@ The recommended **Start with Life Plan** path begins with the current high-schoo
 
 ### Deployment verification
 
-Serve the repository root over HTTP, open `/v2/`, and verify all seven hash routes, create/load/import/export, the shared period control, cross-links, and the browser console. After pushing, confirm remote `main`, then confirm the deployed HTML references matching `app.css?v=2.1.8` and `app.js?v=2.1.8`. A stale Pages response is a propagation state, not permission to mix asset revisions.
+Serve the repository root over HTTP, open `/v2/`, and verify all seven hash routes, create/load/import/export, the shared period control, cross-links, and the browser console. The recommended Life Plan asks only for birth year, then runs a real production projection with disclosed planning assumptions; it is not persisted until explicitly saved. After pushing, confirm remote `main`, then confirm the deployed HTML references matching `app.css?v=2.1.9` and `app.js?v=2.1.9`. A stale Pages response is a propagation state, not permission to mix asset revisions.
 
 ### Current limitations and deferred work
 

@@ -1,7 +1,7 @@
 const allowedViews=new Set(['overview','cash-flow','assets','real-estate','goals','timeline','model']);
 
 export function createAppStore(initial={}){
-  let state={exampleMode:false,exampleReturn:null,candidateReturn:null,templateReview:false,activeView:'overview',model:null,editor:null,setupSection:'setup',loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,selectedPropertyId:null,selectedGoalId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};
+  let state={exampleMode:false,lifePlanMode:false,exampleReturn:null,candidateReturn:null,templateReview:false,activeView:'overview',model:null,editor:null,setupSection:'setup',loadState:'NO_MODEL',validation:null,readiness:null,health:null,audit:null,simulation:null,manifest:null,selectedYear:null,selectedTimelineItemId:null,selectedPropertyId:null,selectedGoalId:null,timelineCategory:'all',importCandidate:null,importResult:null,error:null,...structuredClone(initial)};
   const listeners=new Set();
   const getState=()=>state;
   const setState=(patch,{notify=true}={})=>{state={...state,...(typeof patch==='function'?patch(state):patch)};if(notify)for(const listener of listeners)listener(state);return state;};
