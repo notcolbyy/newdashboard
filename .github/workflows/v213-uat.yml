@@ -40,8 +40,8 @@ jobs:
       - name: Verify synchronized V2 assets
         shell: bash
         run: |
-          grep -Fq './app.css?v=2.1.8' v2/index.html
-          grep -Fq './app.js?v=2.1.8' v2/index.html
+          grep -Fq './app.css?v=2.1.9' v2/index.html
+          grep -Fq './app.js?v=2.1.9' v2/index.html
 
       - name: Smoke V2 through HTTP
         shell: bash
@@ -55,8 +55,8 @@ jobs:
             fi
             sleep 0.25
           done
-          grep -Fq './app.css?v=2.1.8' /tmp/v213-index.html
-          grep -Fq './app.js?v=2.1.8' /tmp/v213-index.html
+          grep -Fq './app.css?v=2.1.9' /tmp/v213-index.html
+          grep -Fq './app.js?v=2.1.9' /tmp/v213-index.html
           curl --fail --silent --show-error http://127.0.0.1:4173/v2/app.css > /dev/null
           curl --fail --silent --show-error http://127.0.0.1:4173/v2/app.js > /dev/null
           curl --fail --silent --show-error http://127.0.0.1:4173/js/v2/templates/life-plan.js > /dev/null
